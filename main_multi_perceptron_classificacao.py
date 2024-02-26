@@ -161,7 +161,7 @@ if __name__ == "__main__":
          file_input_chuva='/Users/arthurjanuzzi/Desktop/IC/concatenado/chuva.csv',
          tempo_antecedencia=24,    #4, 6, 8, 10, 12, 16, 20 e 24 horas
          num_neurons=72,
-         num_epochs=300,
+         num_epochs=250,
          func_camada_oculta= 'relu',
          func_camada_saida= 'sigmoid',
          learning_rate = 0.001,
