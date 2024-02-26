@@ -123,11 +123,6 @@ def train_neural_network(x_train, y_train, num_neurons, num_epochs, func_camada_
     model.summary()
     return result_fit, model
 
-def weighted_binary_crossentropy(y_true, y_pred, weight=6.0): #faz o cross com a rede binaria para ter conhecimento do aprendizado
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.clip_by_value(y_pred, tf.keras.backend.epsilon(), 1 - tf.keras.backend.epsilon())
-    logloss = -(y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(1 - y_pred))
-    return tf.reduce_mean(weight * y_true * logloss + (1 - y_true) * logloss)
     
 def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas):
     X, Y = [], []
@@ -159,7 +154,7 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas):
 if __name__ == "__main__":
     main(file_input_cota='/Users/arthurjanuzzi/Desktop/IC/concatenado/cota.csv',
          file_input_chuva='/Users/arthurjanuzzi/Desktop/IC/concatenado/chuva.csv',
-         tempo_antecedencia=24,    #4, 6, 8, 10, 12, 16, 20 e 24 horas
+         tempo_antecedencia=20,    #4, 6, 8, 10, 12, 16, 20 e 24 horas
          num_neurons=72,
          num_epochs=250,
          func_camada_oculta= 'relu',
