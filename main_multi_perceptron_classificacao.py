@@ -159,7 +159,7 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas):
 if __name__ == "__main__":
     main(file_input_cota='/Users/arthurjanuzzi/Desktop/IC/concatenado/cota.csv',
          file_input_chuva='/Users/arthurjanuzzi/Desktop/IC/concatenado/chuva.csv',
-         tempo_antecedencia=4,
+         tempo_antecedencia=6,
          num_neurons=72,
          num_epochs=300,
          func_camada_oculta= 'relu',
