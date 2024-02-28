@@ -159,9 +159,9 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
 
 
 if __name__ == "__main__":
-    main(file_input_cota='concatenado/cota.csv',
-         file_input_chuva='concatenado/chuva.csv',
-         tempo_antecedencia=24,
+    main(file_input_cota='/content/drive/Shareddrives/PREDIÇÃO_INUNDAÇÃO/2024/DADOS/BACIA_DOCE/SUB_BACIAS_DOCE/1_5611005_RIO_PIRANGA/ESTACOES/concatenado/IC/concatenado/cota.csv',
+         file_input_chuva='/content/drive/Shareddrives/PREDIÇÃO_INUNDAÇÃO/2024/DADOS/BACIA_DOCE/SUB_BACIAS_DOCE/1_5611005_RIO_PIRANGA/ESTACOES/concatenado/IC/concatenado/chuva.csv',
+         tempo_antecedencia=4,
          num_steps = 12,
          num_neurons=24,
          num_epochs=1000,
@@ -169,4 +169,4 @@ if __name__ == "__main__":
          func_camada_saida= 'sigmoid',
          learning_rate = 0.001,
          batch_size=200,
-         dir_output="Saida/")
+         dir_output="/content/drive/Shareddrives/PREDIÇÃO_INUNDAÇÃO/2024/DADOS/BACIA_DOCE/SUB_BACIAS_DOCE/1_5611005_RIO_PIRANGA/ESTACOES/concatenado/IC/Saida/")
