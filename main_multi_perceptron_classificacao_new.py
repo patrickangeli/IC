@@ -161,7 +161,7 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
 if __name__ == "__main__":
     main(file_input_cota='concatenado/cota.csv',
          file_input_chuva='concatenado/chuva.csv',
-         tempo_antecedencia=16,
+         tempo_antecedencia=20,
          num_steps = 12,
          num_neurons=24,
          num_epochs=1000,
