@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 import numpy as np
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -24,6 +25,8 @@ def main(file_input_cota: str,
          porc_registro_por_row: float,
          dir_output: str,
          ):
+    
+    start_time = time.time()
     df_cota = pd.read_csv(file_input_cota, delimiter=';')
     df_chuva = pd.read_csv(file_input_chuva, delimiter=';')
     lst_names_colunms_cota = list(df_cota.columns)
@@ -74,12 +77,16 @@ def main(file_input_cota: str,
     accuracy = result_train.history['accuracy']
     loss = result_train.history['loss']
 
+    
+    end_time = time.time()
+    execution_time = end_time - start_time
     lst_result = zip(loss, accuracy)
     dir_output_result = f"{dir_output}/MLP/{tempo_antecedencia}hours"
     Path(dir_output_result).mkdir(exist_ok=True, parents=True)
-    with open(f'{dir_output_result}/resultTrain_{num_neurons}neurons_{num_steps}steps.txt', 'w') as arquivo:
+    with open(f'{dir_output_result}/resultTrain_{num_neurons}neurons_{num_steps}steps_{num_epochs}epochs.txt', 'w') as arquivo:
         for idx, epoch in enumerate(lst_result):
             arquivo.write(f'EPOCH {idx+1} - loss: {round(epoch[0], 4)}, accuracy: {round(epoch[1], 4)} \n')
+        arquivo.write(f'\nExecution Time: {round(execution_time, 2)} seconds\n')
 
     # TESTE
     X_test = np.expand_dims(X_test, axis=1)
@@ -91,7 +98,7 @@ def main(file_input_cota: str,
     data_Y_predict = classe_predita.ravel().tolist()
     data_Y_org = Y_test.ravel().tolist()
     
-    file_info_test = f'{dir_output_result}/resultTest_{num_neurons}neurons_{num_steps}steps.txt'
+    file_info_test = f'{dir_output_result}/resultTest_{num_neurons}neurons_{num_steps}steps_{num_epochs}epochs.txt'
     gerar_csv_teste(data_Y_predict, data_Y_org, file_info_test)
 
 def rotular_cota(valor, p1, p2):
@@ -167,13 +174,15 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     return np.array(X), np.array(Y)
 
 
+    
+
 if __name__ == "__main__":
     main(file_input_cota='../Entrada/cota.csv',
          file_input_chuva='../Entrada/chuva.csv',
          tempo_antecedencia=24,
          num_steps=6,
          num_neurons=60,
-         num_epochs=50,
+         num_epochs=1000,
          func_camada_oculta= 'relu',
          func_camada_saida= 'sigmoid',
          learning_rate = 0.001,
