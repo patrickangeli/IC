@@ -182,7 +182,7 @@ if __name__ == "__main__":
          tempo_antecedencia=24,
          num_steps=6,
          num_neurons=60,
-         num_epochs=1000,
+         num_epochs=500,
          func_camada_oculta= 'relu',
          func_camada_saida= 'sigmoid',
          learning_rate = 0.001,
