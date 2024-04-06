@@ -183,6 +183,6 @@ if __name__ == "__main__":
          file_input_chuva='/content/IC/Entrada/chuva.csv',
          tempo_antecedencia=8,
          param_grid = dict(num_steps=[6,12], num_neurons=[24,36,48,60,72], num_epochs=500, batch_size=100),
-         batch_size=100,
+       #  batch_size=100,
          porc_registro_por_row = 0.5,
          dir_output="/content/IC/Saida")
