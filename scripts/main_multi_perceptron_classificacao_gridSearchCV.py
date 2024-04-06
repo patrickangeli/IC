@@ -17,7 +17,7 @@ from sklearn.model_selection import GridSearchCV
 def main(file_input_cota: str,
          file_input_chuva: str,
          tempo_antecedencia: int,
-    #     num_steps: int,
+         num_steps: int,
     #    num_neurons: int,
     #     num_epochs: int,
     #     func_camada_oculta: str,
@@ -72,6 +72,7 @@ def main(file_input_cota: str,
     data_Y = np.array(df_concatenado_filter[['classe']].values)
     data_Y = data_Y.astype(int)
 
+    
     X, Y = create_sequences(data_X, data_Y, tempo_antecedencia, lst_datetimes, num_steps)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
     result_train, model = create_model(optimizer=Adam)
@@ -182,7 +183,8 @@ if __name__ == "__main__":
     main(file_input_cota='/content/IC/Entrada/cota.csv',
          file_input_chuva='/content/IC/Entrada/chuva.csv',
          tempo_antecedencia=8,
-         param_grid = dict(num_steps=[6,12], num_neurons=[24,36,48,60,72], num_epochs=500, batch_size=100),
+         num_steps = 6
+         param_grid = dict(num_neurons=[24,36,48,60,72], num_epochs=500, batch_size=100),
        #  batch_size=100,
          porc_registro_por_row = 0.5,
          dir_output="/content/IC/Saida")
