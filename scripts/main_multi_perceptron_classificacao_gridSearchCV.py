@@ -75,7 +75,7 @@ def main(file_input_cota: str,
     
     X, Y = create_sequences(data_X, data_Y, tempo_antecedencia, lst_datetimes, num_steps)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    result_train, model = create_model(optimizer=Adam)
+    result_train, model = create_model()
     GrindSearch(X_train, Y_train, model)
     accuracy = result_train.history['accuracy']
     loss = result_train.history['loss']
