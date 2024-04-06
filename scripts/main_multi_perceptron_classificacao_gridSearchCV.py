@@ -17,13 +17,14 @@ from sklearn.model_selection import GridSearchCV
 def main(file_input_cota: str,
          file_input_chuva: str,
          tempo_antecedencia: int,
-         num_steps: int,
-         num_neurons: int,
-         num_epochs: int,
-         func_camada_oculta: str,
-         func_camada_saida: str,
-         learning_rate: float,
-         batch_size: int,
+    #     num_steps: int,
+    #    num_neurons: int,
+    #     num_epochs: int,
+    #     func_camada_oculta: str,
+    #     func_camada_saida: str,
+    #     learning_rate: float,
+    #     batch_size: int,
+         param_grid: dict,
          porc_registro_por_row: float,
          dir_output: str,
 
@@ -73,17 +74,19 @@ def main(file_input_cota: str,
 
     X, Y = create_sequences(data_X, data_Y, tempo_antecedencia, lst_datetimes, num_steps)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    result_train, model = train_neural_network(X_train, Y_train, num_neurons, num_epochs, func_camada_oculta, learning_rate, batch_size, func_camada_saida)
-
+    result_train, model = create_model(optimizer=Adam)
+    GrindSearch(X_train, Y_train, model)
     accuracy = result_train.history['accuracy']
     loss = result_train.history['loss']
 
-    lst_result = zip(loss, accuracy)
-    dir_output_result = f"{dir_output}/MLP/{tempo_antecedencia}hours"
-    Path(dir_output_result).mkdir(exist_ok=True, parents=True)
-    with open(f'{dir_output_result}/resultTrain_{num_neurons}neurons_{num_steps}steps.txt', 'w') as arquivo:
-        for idx, epoch in enumerate(lst_result):
-            arquivo.write(f'EPOCH {idx+1} - loss: {round(epoch[0], 4)}, accuracy: {round(epoch[1], 4)} \n')
+    for num_neurons in param_grid['num_neurons']:
+        for num_steps in param_grid['num_steps']:
+            lst_result = zip(loss, accuracy)
+            dir_output_result = f"{dir_output}/MLP/{tempo_antecedencia}hours"
+            Path(dir_output_result).mkdir(exist_ok=True, parents=True)
+            with open(f'{dir_output_result}/resultTrain_{num_neurons}neurons_{num_steps}steps.txt', 'w') as arquivo:
+                for idx, epoch in enumerate(lst_result):
+                    arquivo.write(f'EPOCH {idx+1} - loss: {round(epoch[0], 4)}, accuracy: {round(epoch[1], 4)} \n')
 
     # TESTE
     X_test = np.expand_dims(X_test, axis=1)
@@ -122,20 +125,25 @@ def test_neural_network(x_test, model):
     predict_values = model.predict(x_test)
     return predict_values
 
-def train_neural_network(x_train, y_train, num_neurons, num_epochs, func_camada_oculta, learning_rate, batch_size, func_camada_saida):
+def create_model(num_neurons=1, learning_rate=0.001, func_camada_oculta='relu', func_camada_saida='softmax'):
     num_classes = 3
-    y_train_encoded = to_categorical(y_train, num_classes=num_classes)
-    x_train = np.expand_dims(x_train, axis=1)
-    x_train = np.concatenate(x_train, axis=0)
-
     model = Sequential()
-    model.add(SimpleRNN(units=num_neurons, activation=func_camada_oculta))
-    model.add(Dense(units=num_classes, activation=func_camada_saida))
+    model.add(SimpleRNN(units=num_neurons, activation='relu'))
+    model.add(Dense(units=num_classes, activation='softmax'))
     optimizer = Adam(learning_rate=learning_rate)
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
-    result_fit = model.fit(x_train, y_train_encoded, epochs=num_epochs, batch_size=batch_size) # batch_size(tamanho da amostra a cada iteração)
-    model.summary()
-    return result_fit, model
+    return model
+
+def GrindSearch(x_train, y_train, create_model, param_grid):
+    num_classes = 3 
+    model = KerasClassifier(build_fn=create_model, verbose=2)
+    y_train_encoded = to_categorical(y_train, num_classes=num_classes)
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=None, cv=5)
+    grid_result = grid.fit(x_train, y_train_encoded)
+    return grid_result
+
+
+
 
 def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     X, Y = [], []
@@ -170,17 +178,11 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
         X.append(x_sequence)
     return np.array(X), np.array(Y)
 
-
 if __name__ == "__main__":
     main(file_input_cota='/content/IC/Entrada/cota.csv',
          file_input_chuva='/content/IC/Entrada/chuva.csv',
          tempo_antecedencia=8,
-         num_steps=6,
-         num_neurons=60,
-         num_epochs=50,
-         func_camada_oculta= 'relu',
-         func_camada_saida= 'sigmoid',
-         learning_rate = 0.001,
+         param_grid = dict(num_steps=[6,12], num_neurons=[24,36,48,60,72], num_epochs=500, batch_size=100),
          batch_size=100,
          porc_registro_por_row = 0.5,
          dir_output="/content/IC/Saida")
