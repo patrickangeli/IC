@@ -180,11 +180,11 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     return np.array(X), np.array(Y)
 
 if __name__ == "__main__":
-    main(file_input_cota='/content/IC/Entrada/cota.csv',
-         file_input_chuva='/content/IC/Entrada/chuva.csv',
+    main(file_input_cota='../IC/Entrada/cota.csv',
+         file_input_chuva='../IC/Entrada/chuva.csv',
          tempo_antecedencia=8,
-         num_steps = 6
+         num_steps = 6,
          param_grid = dict(num_neurons=[24,36,48,60,72], num_epochs=500, batch_size=100),
        #  batch_size=100,
          porc_registro_por_row = 0.5,
-         dir_output="/content/IC/Saida")
+         dir_output="../IC/Saida")
