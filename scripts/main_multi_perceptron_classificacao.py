@@ -179,9 +179,9 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
 if __name__ == "__main__":
     main(file_input_cota='/content/IC/Entrada/cota.csv',
          file_input_chuva='/content/IC/Entrada/chuva.csv',
-         tempo_antecedencia=10, #14,16,20,24
+         tempo_antecedencia=12, #14,16,20,24
          num_steps=6,
-         num_neurons=72,        #24,36,48,72
+         num_neurons=24,        #24,36,48,72
          num_epochs=500,
          func_camada_oculta= 'relu',
          func_camada_saida= 'sigmoid',
