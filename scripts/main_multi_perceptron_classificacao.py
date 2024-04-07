@@ -177,8 +177,8 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     
 
 if __name__ == "__main__":
-    main(file_input_cota='../Entrada/cota.csv',
-         file_input_chuva='../Entrada/chuva.csv',
+    main(file_input_cota='./Entrada/cota.csv',
+         file_input_chuva='./Entrada/chuva.csv',
          tempo_antecedencia=8, #14,16,20,24
          num_steps=6,
          num_neurons=72,        #24,36,48,72
@@ -188,4 +188,4 @@ if __name__ == "__main__":
          learning_rate = 0.001,
          batch_size=100,
          porc_registro_por_row = 0.5,
-         dir_output="../Saida/")
+         dir_output="./Saida/")
