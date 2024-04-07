@@ -181,7 +181,7 @@ if __name__ == "__main__":
          file_input_chuva='./Entrada/chuva.csv',
          tempo_antecedencia=10, #14,16,20,24
          num_steps=6,
-         num_neurons=24,        #24,36,48,72
+         num_neurons=36,        #24,36,48,72
          num_epochs=500,
          func_camada_oculta= 'relu',
          func_camada_saida= 'sigmoid',
