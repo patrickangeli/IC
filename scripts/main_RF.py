@@ -141,9 +141,9 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     return np.array(X), np.array(Y)
 
 if __name__ == "__main__":
-    lst_tempo_antecedencia = [6 , 12] # 6 a 24
-    lst_steps = [6, 8] # 6 a 12
-    lst_n_estimators = [25, 50] # 24 ate 72, variando de 12 em 12
+    lst_tempo_antecedencia = [6, 8, 10, 12, 14, 16,20,24] # 6 a 24
+    lst_steps = [6, 12] # 6 a 12
+    lst_n_estimators = [24, 36, 48, 60, 72] # 24 ate 72, variando de 12 em 12
     
     for estimador in lst_n_estimators:
         for step in lst_steps:
