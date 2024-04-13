@@ -1,0 +1,12 @@
+EPOCH 1 - loss: 0.5729, accuracy: 0.7829 
+EPOCH 2 - loss: 0.5478, accuracy: 0.7933 
+EPOCH 3 - loss: 0.5373, accuracy: 0.7936 
+EPOCH 4 - loss: 0.5314, accuracy: 0.7955 
+EPOCH 5 - loss: 0.5232, accuracy: 0.8003 
+EPOCH 6 - loss: 0.5168, accuracy: 0.8041 
+EPOCH 7 - loss: 0.5092, accuracy: 0.8064 
+EPOCH 8 - loss: 0.5074, accuracy: 0.8072 
+EPOCH 9 - loss: 0.5005, accuracy: 0.8084 
+EPOCH 10 - loss: 0.4997, accuracy: 0.8106 
+
+Execution Time: 250.18 seconds

@@ -1,32 +1,21 @@
 import pandas as pd
-import time
 import numpy as np
 from datetime import datetime, timedelta
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential
-from keras.layers import Dense, SimpleRNN
-from keras.optimizers import Adam
-from keras.utils import to_categorical
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
 
-# 0-NORMAL, 1-ATENÇÃO, 2-INUNDAÇÃO
 
 def main(file_input_cota: str, 
          file_input_chuva: str,
          tempo_antecedencia: int,
-         num_steps: int,
-         num_neurons: int, 
-         num_epochs: int, 
-         func_camada_oculta: str,
-         func_camada_saida: str,
-         learning_rate: float, 
-         batch_size: int,
-         porc_registro_por_row: float,
+         n_estimators: int, 
+         porc_necessario_registros_por_row: float,
+         num_steps: int, 
          dir_output: str,
          ):
-    
-    start_time = time.time()
     df_cota = pd.read_csv(file_input_cota, delimiter=';')
     df_chuva = pd.read_csv(file_input_chuva, delimiter=';')
     lst_names_colunms_cota = list(df_cota.columns)
@@ -41,7 +30,7 @@ def main(file_input_cota: str,
     df_concatenado = df_concatenado.rename(columns={'chuva_data': 'data'})
     df_concatenado.replace('-999.99', -999.99, inplace=True)
     lst_cod_estacoes = list(df_concatenado.columns)
-    num_necessario_registros_por_row = int(porc_registro_por_row * len(lst_cod_estacoes))
+    num_necessario_registros_por_row = int(porc_necessario_registros_por_row * len(lst_cod_estacoes))
     estacao_interesse = lst_cod_estacoes[-1]
     df_concatenado_filter = df_concatenado.loc[df_concatenado[estacao_interesse] != -999.99]
    
@@ -68,37 +57,22 @@ def main(file_input_cota: str,
     scaler = MinMaxScaler(feature_range=(0,1))
     data_X = scaler.fit_transform(df_concatenado_filter[lst_cod_estacoes[1:-1]].values)
     data_Y = np.array(df_concatenado_filter[['classe']].values)
-    data_Y = data_Y.astype(int)
-    
+    data_Y = data_Y.astype(int) 
+
     X, Y = create_sequences(data_X, data_Y, tempo_antecedencia, lst_datetimes, num_steps)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
-    result_train, model = train_neural_network(X_train, Y_train, num_neurons, num_epochs, func_camada_oculta, learning_rate, batch_size, func_camada_saida)
     
-    accuracy = result_train.history['accuracy']
-    loss = result_train.history['loss']
-
-    
-    end_time = time.time()
-    execution_time = end_time - start_time
-    lst_result = zip(loss, accuracy)
-    dir_output_result = f"{dir_output}/MLP/{tempo_antecedencia}hours"
-    Path(dir_output_result).mkdir(exist_ok=True, parents=True)
-    with open(f'{dir_output_result}/resultTrain_{num_neurons}neurons_{num_steps}steps_{num_epochs}epochs.txt', 'w') as arquivo:
-        for idx, epoch in enumerate(lst_result):
-            arquivo.write(f'EPOCH {idx+1} - loss: {round(epoch[0], 4)}, accuracy: {round(epoch[1], 4)} \n')
-        arquivo.write(f'\nExecution Time: {round(execution_time, 2)} seconds\n')
-
     # TESTE
-    X_test = np.expand_dims(X_test, axis=1)
-    X_test = np.concatenate(X_test, axis=0)   
-    Y_test = Y_test.astype(int)
-    predict_test = test_neural_network(X_test, model)
-    predict_test_normlized = predict_test / np.sum(predict_test)
-    classe_predita = np.argmax(predict_test_normlized, axis=1)
-    data_Y_predict = classe_predita.ravel().tolist()
+    model = train_random_forest(X_train, Y_train, n_estimators)
+    predict_test = test_random_forest(X_test, model)
     data_Y_org = Y_test.ravel().tolist()
+    data_Y_predict = predict_test.ravel().tolist()
+    data_Y_org = [int(round(valor, 2)) for valor in data_Y_org]
+    data_Y_predict = [int(round(valor, 2)) for valor in predict_test]
     
-    file_info_test = f'{dir_output_result}/resultTest_{num_neurons}neurons_{num_steps}steps_{num_epochs}epochs.txt'
+    dir_output_result = f"{dir_output}/RF/{tempo_antecedencia}hours"
+    Path(dir_output_result).mkdir(exist_ok=True, parents=True)
+    file_info_test = f'{dir_output_result}/resultTest_{n_estimators}estimators_{num_steps}steps.txt'
     gerar_csv_teste(data_Y_predict, data_Y_org, file_info_test)
 
 def rotular_cota(valor, p1, p2):
@@ -110,7 +84,7 @@ def rotular_cota(valor, p1, p2):
         return 2
     else:
         return -999.99
-
+    
 def gerar_csv_teste(y_pred, y_true, file_info_output):
     coluna_pred = [elem for elem in y_pred]
     coluna_true = [elem for elem in y_true]
@@ -121,24 +95,17 @@ def gerar_csv_teste(y_pred, y_true, file_info_output):
     file_csv = f"{dir_output}/{Path(file_info_output).name.replace('.txt', '.csv')}"
     df.to_csv(file_csv, index=False)
     
-def test_neural_network(x_test, model):
-    predict_values = model.predict(x_test)
-    return predict_values
+def test_random_forest(x_test, model):
+    x_test = x_test.reshape(x_test.shape[0], -1)
+    y_pred = model.predict(x_test)
+    return y_pred
 
-def train_neural_network(x_train, y_train, num_neurons, num_epochs, func_camada_oculta, learning_rate, batch_size, func_camada_saida):
-    num_classes = 3
-    y_train_encoded = to_categorical(y_train, num_classes=num_classes)
-    x_train = np.expand_dims(x_train, axis=1)
-    x_train = np.concatenate(x_train, axis=0)
-    
-    model = Sequential()
-    model.add(SimpleRNN(units=num_neurons, activation=func_camada_oculta))
-    model.add(Dense(units=num_classes, activation=func_camada_saida))
-    optimizer = Adam(learning_rate=learning_rate)
-    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
-    result_fit = model.fit(x_train, y_train_encoded, epochs=num_epochs, batch_size=batch_size) # batch_size(tamanho da amostra a cada iteração)
-    model.summary()
-    return result_fit, model
+def train_random_forest(x_train, y_train, n_estimators):
+    x_train = x_train.reshape(x_train.shape[0], -1)
+    y_train = y_train.ravel()
+    model = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+    model.fit(x_train, y_train)
+    return model
     
 def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     X, Y = [], []
@@ -173,19 +140,18 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
         X.append(x_sequence)
     return np.array(X), np.array(Y)
 
-
-    
-
 if __name__ == "__main__":
-    main(file_input_cota='../Entrada/cota.csv',
-         file_input_chuva='../Entrada/chuva.csv',
-         tempo_antecedencia=24, #14,16,20,24
-         num_steps=6,
-         num_neurons=36,        #24,36,48,72
-         num_epochs=500,
-         func_camada_oculta= 'relu',
-         func_camada_saida= 'sigmoid',
-         learning_rate = 0.001,
-         batch_size=100,
-         porc_registro_por_row = 0.5,
-         dir_output="../Saida/")
+    lst_tempo_antecedencia = [6 , 12] # 6 a 24
+    lst_steps = [6, 8] # 6 a 12
+    lst_n_estimators = [25, 50] # 24 ate 72, variando de 12 em 12
+    
+    for estimador in lst_n_estimators:
+        for step in lst_steps:
+            for tempo_antecedencia in lst_tempo_antecedencia:
+                main(file_input_cota='Entrada/bacia_piranga/cota.csv',
+                    file_input_chuva='Entrada/bacia_piranga/chuva.csv',
+                    tempo_antecedencia=tempo_antecedencia,
+                    num_steps=step,
+                    n_estimators=estimador,
+                    porc_necessario_registros_por_row=0.5,
+                    dir_output="Saida/bacia_piranga")
