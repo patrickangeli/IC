@@ -177,15 +177,22 @@ def create_sequences(data_x, data_y, tempo_antecedencia, lst_datas, num_steps):
     
 
 if __name__ == "__main__":
-    main(file_input_cota='../Entrada/cota.csv',
-         file_input_chuva='../Entrada/chuva.csv',
-         tempo_antecedencia=24, #14,16,20,24
-         num_steps=6,
-         num_neurons=36,        #24,36,48,72
-         num_epochs=500,
-         func_camada_oculta= 'relu',
-         func_camada_saida= 'sigmoid',
-         learning_rate = 0.001,
-         batch_size=100,
-         porc_registro_por_row = 0.5,
-         dir_output="../Saida/")
+    lst_tempo_antecedencia = [6, 8, 10, 12, 14, 16,20,24] # 6 a 24
+    lst_steps = 12 # 6 a 12
+    lst_n_estimators = [24, 36, 48, 60, 72] # 24 ate 72, variando de 12 em 12
+    
+    for tempo_antecedencia in lst_tempo_antecedencia:
+        for estimador in lst_n_estimators:
+            for step in lst_steps:            
+                main(file_input_cota='../Entrada/cota.csv',
+                    file_input_chuva='../Entrada/chuva.csv',
+                    tempo_antecedencia=tempo_antecedencia, #14,16,20,24
+                    num_steps=step,
+                    num_neurons=estimador,        #24,36,48,72
+                    num_epochs=500,
+                    func_camada_oculta= 'relu',
+                    func_camada_saida= 'sigmoid',
+                    learning_rate = 0.001,
+                    batch_size=100,
+                    porc_registro_por_row = 0.5,
+                    dir_output="../Saida/")
