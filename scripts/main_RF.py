@@ -148,8 +148,8 @@ if __name__ == "__main__":
     for estimador in lst_n_estimators:
         for step in lst_steps:
             for tempo_antecedencia in lst_tempo_antecedencia:
-                main(file_input_cota='Entrada/bacia_piranga/cota.csv',
-                    file_input_chuva='Entrada/bacia_piranga/chuva.csv',
+                main(file_input_cota='/content/drive/Shareddrives/PREDIÇÃO_INUNDAÇÃO/2024/DADOS/BACIA_DOCE/SUB_BACIAS_DOCE/1_5611005_RIO_PIRANGA/ESTACOES/DEEP_LEARNING/IC/Entrada/cota.csv',
+                    file_input_chuva='/content/drive/Shareddrives/PREDIÇÃO_INUNDAÇÃO/2024/DADOS/BACIA_DOCE/SUB_BACIAS_DOCE/1_5611005_RIO_PIRANGA/ESTACOES/DEEP_LEARNING/IC/Entrada/chuva.csv',
                     tempo_antecedencia=tempo_antecedencia,
                     num_steps=step,
                     n_estimators=estimador,
