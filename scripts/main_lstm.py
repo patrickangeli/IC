@@ -84,7 +84,7 @@ def main(file_input_cota: str,
     lst_loss = result_fit.history['loss']
     lst_accuracy = result_fit.history['accuracy']
     
-    dir_result = f"Saida/{file_input_cota.split('/')[1]}/LSTM/{tempo_antecedencia}hours"
+    dir_result = f"../Saida/{file_input_cota.split('/')[1]}/LSTM/{tempo_antecedencia}hours"
     Path(dir_result).mkdir(exist_ok=True, parents=True)
     file_output = f"resultTrain_{num_celulas_lstm}neurons_{num_steps}_steps.txt"
     filename_output = f"{dir_result}/{file_output}"
@@ -158,20 +158,20 @@ def gerar_csv_teste(y_pred, y_true, file_info_output):
 
 
 if __name__ == "__main__":
-    lst_tempo_antecedencia = [6, 8, 10, 12, 14, 16,20,24] # 6 a 24
-    lst_steps = [6, 12] # 6 a 12
+    lst_tempo_antecedencia = [6,8,10,12,14,16,20,24] # 6 a 24
+    lst_steps = [6,12] # 6 a 12
     lst_n_estimators = [24, 36, 48, 60, 72] # 24 ate 72, variando de 12 em 12
 
     for estimador in lst_n_estimators:
         for step in lst_steps:
             for tempo_antecedencia in lst_tempo_antecedencia:
-                main(file_input_cota='Entrada/bacia_piranga/cota.csv',
-                    file_input_chuva='Entrada/bacia_piranga/chuva.csv',
+                main(file_input_cota='../Entrada/cota.csv',
+                    file_input_chuva='../Entrada/chuva.csv',
                     tempo_antecedencia=tempo_antecedencia,
                     num_steps = step,
                     num_celulas_lstm=estimador,
                     num_camadas_lstm_empilhadas=1,
-                    num_epochs=50,
+                    num_epochs=500,
                     batch_size=100,
                     loss = 'sparse_categorical_crossentropy',
                     porc_registro_por_row = 0.5
